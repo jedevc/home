@@ -1,0 +1,33 @@
+version: '3'
+services:
+  freshrss:
+    image: linuxserver/freshrss
+    restart: unless-stopped
+    environment:
+      TZ: Europe/London
+    volumes:
+      - freshrss-config:/config
+    depends_on:
+      - freshrss-db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.freshrss.loadbalancer.server.port=80"
+      - "traefik.http.routers.freshrss.rule=Host(`news.$DOMAIN`)"
+      - "traefik.http.routers.freshrss.tls=true"
+      # - "traefik.http.routers.freshrss.tls.certresolver=resolver"
+
+  freshrss-db:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: enable
+      MYSQL_USER: ${FRESHRSS_DB_USER:-freshrss}
+      MYSQL_PASSWORD: ${FRESHRSS_DB_PASSWORD:-freshrss}
+      MYSQL_DATABASE: ${FRESHRSS_DB_DATABASE:-freshrss}
+    volumes:
+      - freshrss-db-data:/var/lib/mysql
+
+volumes:
+  freshrss-db-data:
+  freshrss-config:
+  

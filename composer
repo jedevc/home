@@ -1,0 +1,5 @@
+#!/bin/bash
+
+ARGS=$(find . -name "docker-compose*.yml" -printf '-f %P ')
+docker-compose $ARGS $@
+exit $?

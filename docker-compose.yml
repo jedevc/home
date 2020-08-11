@@ -1,0 +1,36 @@
+version: '3'
+services:
+  traefik:
+    image: traefik:v2.2
+    command:
+      - --api=true
+      - --api.dashboard=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+
+      # - --certificatesResolvers.resolver.acme.email=$EMAIL
+      # - --certificatesResolvers.resolver.acme.storage=/acme/acme.json
+      # - --certificatesresolvers.resolver.acme.httpchallenge=true
+      # - --certificatesresolvers.resolver.acme.httpchallenge.entrypoint=web
+      # - --certificatesResolvers.resolver.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # - ./acme:/acme
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.traefik-http.entrypoints=web"
+      - "traefik.http.routers.traefik-http.rule=Host(`traefik.$DOMAIN`)"
+      - "traefik.http.routers.traefik-http.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+      - "traefik.http.routers.traefik.rule=Host(`traefik.$DOMAIN`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.tls=true"
+      # - "traefik.http.routers.traefik.tls.certresolver=resolver"
