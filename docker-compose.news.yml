@@ -31,9 +31,9 @@ services:
     restart: always
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: enable
-      MYSQL_USER: ${FRESHRSS_DB_USER:-freshrss}
-      MYSQL_PASSWORD: ${FRESHRSS_DB_PASSWORD:-freshrss}
-      MYSQL_DATABASE: ${FRESHRSS_DB_DATABASE:-freshrss}
+      MYSQL_USER: ${FRESHRSS_DB_USER}
+      MYSQL_PASSWORD: ${FRESHRSS_DB_PASSWORD}
+      MYSQL_DATABASE: ${FRESHRSS_DB_DATABASE}
     volumes:
       - freshrss-db-data:/var/lib/mysql
 
