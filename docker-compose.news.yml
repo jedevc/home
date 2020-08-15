@@ -11,10 +11,20 @@ services:
       - freshrss-db
     labels:
       - "traefik.enable=true"
+
       - "traefik.http.services.freshrss.loadbalancer.server.port=80"
+
+      - "traefik.http.routers.freshrss-http.entrypoints=web"
+      - "traefik.http.routers.freshrss-http.rule=Host(`news.$DOMAIN`)"
+      - "traefik.http.routers.freshrss-http.middlewares=redirect-to-https"
+
+      - "traefik.http.routers.freshrss.entrypoints=websecure"
+      - "traefik.http.routers.freshrss.service=freshrss"
       - "traefik.http.routers.freshrss.rule=Host(`news.$DOMAIN`)"
       - "traefik.http.routers.freshrss.tls=true"
-      # - "traefik.http.routers.freshrss.tls.certresolver=resolver"
+      - "traefik.http.routers.freshrss.tls.certresolver=resolver"
+
+      - "traefik.http.routers.freshrss.middlewares=traefik-forward-auth"
 
   freshrss-db:
     image: mariadb

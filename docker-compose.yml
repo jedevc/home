@@ -11,26 +11,61 @@ services:
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
 
-      # - --certificatesResolvers.resolver.acme.email=$EMAIL
-      # - --certificatesResolvers.resolver.acme.storage=/acme/acme.json
-      # - --certificatesresolvers.resolver.acme.httpchallenge=true
-      # - --certificatesresolvers.resolver.acme.httpchallenge.entrypoint=web
-      # - --certificatesResolvers.resolver.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory
+      - --certificatesResolvers.resolver.acme.email=$ACME_EMAIL
+      - --certificatesResolvers.resolver.acme.storage=/acme/acme.json
+      - --certificatesresolvers.resolver.acme.httpchallenge=true
+      - --certificatesresolvers.resolver.acme.httpchallenge.entrypoint=web
+      - --certificatesResolvers.resolver.acme.caServer=$ACME_API
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      # - ./acme:/acme
+      - acme:/acme
       - /var/run/docker.sock:/var/run/docker.sock
     labels:
       - "traefik.enable=true"
 
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
       - "traefik.http.routers.traefik-http.entrypoints=web"
       - "traefik.http.routers.traefik-http.rule=Host(`traefik.$DOMAIN`)"
       - "traefik.http.routers.traefik-http.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
+      - "traefik.http.routers.traefik.entrypoints=websecure"
       - "traefik.http.routers.traefik.rule=Host(`traefik.$DOMAIN`)"
       - "traefik.http.routers.traefik.service=api@internal"
       - "traefik.http.routers.traefik.tls=true"
-      # - "traefik.http.routers.traefik.tls.certresolver=resolver"
+      - "traefik.http.routers.traefik.tls.certresolver=resolver"
+      - "traefik.http.routers.traefik.middlewares=traefik-forward-auth"
+
+  traefik-forward-auth:
+    image: thomseddon/traefik-forward-auth
+    environment:
+      - AUTH_HOST=oauth.$DOMAIN
+      - URL_PATH=/_oauth
+      - COOKIE_DOMAIN=$DOMAIN
+      - SECRET=$OAUTH_SECRET
+      - PROVIDERS_GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+      - PROVIDERS_GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
+      - WHITELIST=$GOOGLE_EMAIL
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.services.traefik-forward-auth.loadbalancer.server.port=4181"
+      - "traefik.http.middlewares.traefik-forward-auth.forwardauth.address=http://traefik-forward-auth:4181"
+      - "traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders=X-Forwarded-User"
+
+      - "traefik.http.routers.traefik-forward-auth-http.entrypoints=web"
+      - "traefik.http.routers.traefik-forward-auth-http.rule=Host(`traefik-forward-auth.$DOMAIN`)"
+      - "traefik.http.routers.traefik-forward-auth-http.middlewares=redirect-to-https"
+
+      - "traefik.http.routers.traefik-forward-auth.entrypoints=websecure"
+      - "traefik.http.routers.traefik-forward-auth.service=traefik-forward-auth"
+      - "traefik.http.routers.traefik-forward-auth.rule=Host(`oauth.$DOMAIN`)"
+      - "traefik.http.routers.traefik-forward-auth.tls=true"
+      - "traefik.http.routers.traefik-forward-auth.tls.certresolver=resolver"
+      - "traefik.http.routers.traefik-forward-auth.middlewares=traefik-forward-auth"
+
+volumes:
+  acme:
+  
