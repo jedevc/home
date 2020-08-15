@@ -56,7 +56,7 @@ services:
       - "traefik.http.middlewares.traefik-forward-auth.forwardauth.authResponseHeaders=X-Forwarded-User"
 
       - "traefik.http.routers.traefik-forward-auth-http.entrypoints=web"
-      - "traefik.http.routers.traefik-forward-auth-http.rule=Host(`traefik-forward-auth.$DOMAIN`)"
+      - "traefik.http.routers.traefik-forward-auth-http.rule=Host(`oauth.$DOMAIN`)"
       - "traefik.http.routers.traefik-forward-auth-http.middlewares=redirect-to-https"
 
       - "traefik.http.routers.traefik-forward-auth.entrypoints=websecure"
