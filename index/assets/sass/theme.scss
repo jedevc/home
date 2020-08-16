@@ -1,0 +1,59 @@
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 20vh;
+
+  margin-top: 2em;
+}
+
+.stuck {
+  position: fixed;
+
+  top: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+@media only screen and (max-width: 800px) {
+  html {
+    margin-top: 0;
+  }
+
+  .stuck {
+    display: none;
+  }
+}
+
+.is-dual {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1em;
+}
+
+@media only screen and (max-width: 800px) {
+  .is-dual {
+    grid-template-columns: 1fr;
+    gap: 1px;
+  }
+}
+
+.title {
+  display: inline-block;
+
+  &:after {
+    content: "";
+    height: 2px;
+    display: block;
+    background-color: black;
+
+    width: 0;
+    opacity: 0;
+    transition: 0.4s width, 0.4s opacity;
+  }
+}
+
+.title:target {
+  &:after {
+    width: 100%;
+    opacity: 1;
+  }
+}

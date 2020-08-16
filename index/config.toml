@@ -1,0 +1,6 @@
+baseURL = "https://home.jedevc.com/"
+languageCode = "en-gb"
+title = "Index"
+
+[params]
+    domain = "home.jedevc.com"

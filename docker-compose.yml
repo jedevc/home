@@ -68,6 +68,21 @@ services:
       - "traefik.http.routers.traefik-forward-auth.tls.certresolver=resolver"
       - "traefik.http.routers.traefik-forward-auth.middlewares=traefik-forward-auth"
 
+  index:
+    build: ./index
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.routers.index-http.entrypoints=web"
+      - "traefik.http.routers.index-http.rule=Host(`$DOMAIN`)"
+      - "traefik.http.routers.index-http.middlewares=redirect-to-https"
+
+      - "traefik.http.routers.index.entrypoints=websecure"
+      - "traefik.http.routers.index.rule=Host(`$DOMAIN`)"
+      - "traefik.http.routers.index.tls=true"
+      - "traefik.http.routers.index.tls.certresolver=resolver"
+      - "traefik.http.routers.index.middlewares=traefik-forward-auth"
+
 volumes:
   acme:
   

@@ -1,0 +1,23 @@
+- name: "Infrastructure"
+  icon: "tools"
+  items:
+  - title: "Traefik"
+    subtitle: "Traefik dashboard"
+    link: "https://traefik.DOMAIN"
+
+- name: "Productivity"
+  icon: "list"
+  items:
+  - title: "Wiki"
+    subtitle: "Wiki.js"
+    link: "https://wiki.DOMAIN"
+  - title: "Todo"
+    subtitle: "Vikunja"
+    link: "https://todo.DOMAIN"
+
+- name: "News"
+  icon: "newspaper"
+  items:
+  - title: "News"
+    subtitle: "FreshRSS"
+    link: "https://news.DOMAIN"
