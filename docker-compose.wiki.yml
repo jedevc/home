@@ -9,7 +9,7 @@ services:
       DB_TYPE: postgres
       DB_HOST: wiki-db
       DB_PORT: 5432
-      DB_USER: $WIKIJS_DB_USERNAME
+      DB_USER: $WIKIJS_DB_USER
       DB_PASS: $WIKIJS_DB_PASSWORD
       DB_NAME: $WIKIJS_DB_DATABASE
     labels:
@@ -32,7 +32,7 @@ services:
   wiki-db:
     image: postgres:11-alpine
     environment:
-      POSTGRES_USER: $WIKIJS_DB_USERNAME
+      POSTGRES_USER: $WIKIJS_DB_USER
       POSTGRES_PASSWORD: $WIKIJS_DB_PASSWORD
       POSTGRES_DB: $WIKIJS_DB_DATABASE
     restart: unless-stopped

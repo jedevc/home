@@ -1,0 +1,67 @@
+version: '3'
+services:
+  todo-db:
+    image: mariadb:10
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: enable
+      MYSQL_USER: ${VIKUNJA_DB_USER}
+      MYSQL_PASSWORD: ${VIKUNJA_DB_PASSWORD}
+      MYSQL_DATABASE: ${VIKUNJA_DB_DATABASE}
+    volumes:
+      - todo-db-data:/var/lib/mysql
+    restart: unless-stopped
+
+  todo-api:
+    image: vikunja/api
+    environment:
+      VIKUNJA_DATABASE_HOST: todo-db
+      VIKUNJA_DATABASE_TYPE: mysql
+      VIKUNJA_DATABASE_USER: ${VIKUNJA_DB_USER}
+      VIKUNJA_DATABASE_PASSWORD: ${VIKUNJA_DB_PASSWORD}
+      VIKUNJA_DATABASE_DATABASE: ${VIKUNJA_DB_DATABASE}
+    volumes:
+      - todo-files:/app/vikunja/files
+    depends_on:
+      - todo-db
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.services.todoapi.loadbalancer.server.port=3456"
+
+      - "traefik.http.routers.todoapi-http.entrypoints=web"
+      - "traefik.http.routers.todoapi-http.rule=Host(`todo.$DOMAIN`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.todoapi-http.middlewares=redirect-to-https"
+
+      - "traefik.http.routers.todoapi.entrypoints=websecure"
+      - "traefik.http.routers.todoapi.service=todoapi"
+      - "traefik.http.routers.todoapi.rule=Host(`todo.$DOMAIN`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.todoapi.tls=true"
+      - "traefik.http.routers.todoapi.tls.certresolver=resolver"
+
+      - "traefik.http.routers.todoapi.middlewares=traefik-forward-auth"
+
+  todo-frontend:
+    image: vikunja/frontend
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+
+      - "traefik.http.services.todo.loadbalancer.server.port=80"
+
+      - "traefik.http.routers.todo-http.entrypoints=web"
+      - "traefik.http.routers.todo-http.rule=Host(`todo.$DOMAIN`)"
+      - "traefik.http.routers.todo-http.middlewares=redirect-to-https"
+
+      - "traefik.http.routers.todo.entrypoints=websecure"
+      - "traefik.http.routers.todo.service=todo"
+      - "traefik.http.routers.todo.rule=Host(`todo.$DOMAIN`)"
+      - "traefik.http.routers.todo.tls=true"
+      - "traefik.http.routers.todo.tls.certresolver=resolver"
+
+      - "traefik.http.routers.todo.middlewares=traefik-forward-auth"
+
+volumes:
+  todo-db-data:
+  todo-files:
