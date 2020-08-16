@@ -2,6 +2,7 @@ version: '3'
 services:
   traefik:
     image: traefik:v2.2
+    restart: always
     command:
       - --api=true
       - --api.dashboard=true
@@ -40,6 +41,7 @@ services:
 
   traefik-forward-auth:
     image: thomseddon/traefik-forward-auth
+    restart: always
     environment:
       - AUTH_HOST=oauth.$DOMAIN
       - URL_PATH=/_oauth

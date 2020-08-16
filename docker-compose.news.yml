@@ -28,7 +28,7 @@ services:
 
   freshrss-db:
     image: mariadb
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: enable
       MYSQL_USER: ${FRESHRSS_DB_USER}
