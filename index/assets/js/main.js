@@ -7,7 +7,9 @@ function updateTabs() {
     all[i].parentElement.classList.remove("is-active");
   }
   let result = base.querySelector(`li a[href="${link}"]`);
-  result.parentElement.classList.add("is-active");
+  if (result) {
+    result.parentElement.classList.add("is-active");
+  }
 }
 
 window.addEventListener("load", updateTabs);

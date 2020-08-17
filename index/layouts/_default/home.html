@@ -1,4 +1,5 @@
 {{ define "header" }}
+  <div class="stuck-placeholder"></div>
   <div class="tabs has-background-white is-centered stuck">
     <ul class="container">
       {{ range $section := .Site.Data.links }}
@@ -29,6 +30,7 @@
         {{ $section.name }}
       </h2>
     </a>
+
     <div class="is-dual mb-6">
       {{ range $item := $section.items }}
         {{ $link := replace $item.link "DOMAIN" $.Site.Params.domain }}

@@ -4,18 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <link rel="icon" href="/icons/favicon.ico" type="image/png" />
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"/>
+
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/FortAwesome/Font-Awesome@5.14.0/css/all.min.css">
 
   <title>{{ .Site.Title }}</title>
 
-  {{ $sass := resources.Get "sass/theme.scss" }}
-  {{ $style := $sass | resources.ToCSS | resources.Fingerprint }}
-  <link rel="stylesheet" type="text/css" href="{{ $style.Permalink }}" />
+  {{ $style := resources.Get "sass/theme.scss" }}
+  {{ $styleProcessed := $style | resources.ToCSS | resources.Fingerprint }}
+  <link rel="stylesheet" type="text/css" href="{{ $styleProcessed.Permalink }}" />
+  {{ .Page.Scratch.Add "preload" (slice $styleProcessed.Permalink) }}
 
-  {{ $script := resources.Get "/js/main.js" | resources.Fingerprint }}
-  <script src="{{ $script.Permalink }}"></script>
-  </script>
+  {{ $script := resources.Get "/js/main.js" }}
+  {{ $scriptProcessed := $script | resources.Fingerprint }}
+  <script src="{{ $scriptProcessed.Permalink }}"></script>
+  {{ .Page.Scratch.Add "preload" (slice $scriptProcessed.Permalink) }}
 </head>
 <body>
   <header>
@@ -38,5 +45,17 @@
     {{ block "footer" . }}
     {{ end }}
   </footer>
+
+  {{ $worker := resources.Get "sw.js" }}
+  {{ $workerProcessed := $worker | resources.ExecuteAsTemplate "sw.js" . }}
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register("{{ $workerProcessed.Permalink }}").then((reg) => {
+        console.log('Registration succeeded. Scope is ' + reg.scope);
+      }).catch((error) => {
+        console.error('Registration failed with ' + error);
+      });
+    }
+  </script>
 </body>
 </html>
