@@ -40,7 +40,7 @@ services:
       - "traefik.http.routers.traefik.middlewares=traefik-forward-auth"
 
   traefik-forward-auth:
-    image: thomseddon/traefik-forward-auth
+    image: thomseddon/traefik-forward-auth:2
     restart: always
     environment:
       - AUTH_HOST=oauth.$DOMAIN
@@ -51,6 +51,7 @@ services:
       - PROVIDERS_GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
       - PROVIDERS_GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
       - WHITELIST=$GOOGLE_EMAIL
+      - LOG_LEVEL=info
     labels:
       - "traefik.enable=true"
 
